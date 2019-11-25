@@ -12,7 +12,7 @@ export default class ImageSlideContainer extends Component {
     index: 0,
   }
 
-  renderItem(item) {
+  renderItem({ item }) {
     console.log('renderImageItem', ImgWrapper, item.uri);
     return (
       <ImgWrapper uriPath={item.uri}></ImgWrapper>
@@ -33,10 +33,10 @@ export default class ImageSlideContainer extends Component {
         id: '2',
         uri: "https://greatist.com/sites/default/files/Running_Mountain.jpg",
       },
-      {
-        id: '3',
-        uri: "./resources/image.jpg",
-      }
+      // {
+      //   id: '3',
+      //   uri: "./resources/image.jpg",
+      // }
     ];
 
     return (

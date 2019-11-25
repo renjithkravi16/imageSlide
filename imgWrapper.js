@@ -28,8 +28,7 @@ export default class ImgWrapper extends Component {
             Image.getSize(uriPath, (imgWidth, imgHeight) => {
                 try {
                     let maxWidth = imgWidth * height / imgHeight;
-                    this.setState({ maxWidth });
-                    this.setState({ translateX: maxWidth })
+                    this.setState({ maxWidth, translateX: maxWidth });
                 } catch (err) {
 
                 }
@@ -56,13 +55,13 @@ export default class ImgWrapper extends Component {
         console.log('render');
 
         const { uriPath } = this.props;
-        const { translateX, maxWidth } = this.state;
+        const { translateX } = this.state;
 
         return (
             <View style={{ flex: 1, alignItems: "center" }}>
                 <Animated.Image
                     style={{ height: 900,  resizeMode: 'cover', width: 2000, alignSelf: 'flex-end', transform: [{ translateX }] }}
-                    source={{ uri: 'https://greatist.com/sites/default/files/Running_Mountain.jpg' }}
+                    source={{ uri: uriPath }}
                 />
             </View>
         );
