@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { View, FlatList } from 'react-native';
+import { View, FlatList, Animated, Easing } from 'react-native';
+
 
 export { default as ImgWrapper } from './imgWrapper';
 import ImgWrapper from './imgWrapper';
@@ -7,55 +8,78 @@ import ImgWrapper from './imgWrapper';
 export default class ImageSlideContainer extends Component {
 
   static defaultProps = {
-    items: [],
     duration: 5000,
     index: 0,
+    items: [],
   }
 
-  renderItem({ item }) {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      index: props.index,
+      timer: new Animated.Value(0),
+    };
+
+  }
+
+  componentDidMount() {
+    let { duration } = this.props;
+
+    Animated.timing(this.state.timer, {
+      toValue: 1,
+      easing: Easing.ease,
+      useNativeDriver: true,
+      duration,
+    }).start(({ finished }) => finished && this.snapToNext());
+  }
+
+  animation() {
+    const { index } = this.state;
+    let { duration, items } = this.props;
+
+    return Animated.timing(this.state.timer, {
+      toValue: 1,
+      easing: Easing.ease,
+      useNativeDriver: true,
+      duration,
+    }).start(({ finished }) => finished && this.snapToNext());
+  }
+
+
+  snapToNext() {
+    const { timer, index } = this.state;
+    let { items } = this.props;
+    let newIndex = (index + 1) % items.length;
+
+    timer.stopAnimation(() => {
+
+        this.slideShow.scrollToIndex({ animated: true, index: newIndex });
+        this.setState({ timer: new Animated.Value(0), index: newIndex }, () => {
+          this.animation();
+        });
+      
+    });
+  }
+
+  renderItem({ item, index }) {
     console.log('renderImageItem', ImgWrapper, item.uri);
     return (
-      <ImgWrapper uriPath={item.uri}></ImgWrapper>
+      <ImgWrapper uriPath={item.uri} index={index} ></ImgWrapper>
     );
   }
 
-  renderContent() {
-    const items = [
-      {
-        id: '0',
-        uri: "http://www.lovethemountains.co.uk/wp-content/uploads/2017/05/New-Outdoor-Sports-and-Music-Festival-For-Wales-4.jpg",
-      },
-      {
-        id: '1',
-        uri: "http://blog.adrenaline-hunter.com/wp-content/uploads/2018/05/bungee-jumping-barcelona-1680x980.jpg",
-      },
-      {
-        id: '2',
-        uri: "https://greatist.com/sites/default/files/Running_Mountain.jpg",
-      },
-      // {
-      //   id: '3',
-      //   uri: "./resources/image.jpg",
-      // }
-    ];
+  render() {
+    const list = this.props.items;
 
     return (
       <View style={{ flex: 1 }}>
         <FlatList
           ref={ref => this.slideShow = ref}
-          data={items}
-          renderItem={this.renderItem}
+          data={list}
+          renderItem={this.renderItem.bind(this)}
           keyExtractor={(item, index) => item.id}
         />
-      </View>
-    );
-  }
-
-
-  render() {
-    return (
-      <View style={{ flex: 1 }}>
-        {this.renderContent()}
       </View>
     );
   }

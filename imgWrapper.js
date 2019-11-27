@@ -1,17 +1,18 @@
 
 import React, { Component } from 'react';
-import { View, Image, Animated, Easing } from 'react-native';
+import { View, Image, Animated, Easing, Dimensions } from 'react-native';
+
+export const { screenWidth, screenHeight } = Dimensions.get("window");
 
 export default class ImgWrapper extends Component {
 
     static defaultProps = {
         uriPath: null,
+        index: 0,
     };
 
     constructor(props) {
         super(props)
-        console.log('constructor', props);
-
         this.state = {
             maxWidth: -1,
             maxHeight: 600,
@@ -22,45 +23,51 @@ export default class ImgWrapper extends Component {
     componentDidMount() {
 
         const { uriPath } = this.props;
-        console.log('componentDidMount', this.props);
 
         if (isNaN(uriPath)) {
             Image.getSize(uriPath, (imgWidth, imgHeight) => {
                 try {
-                    let maxWidth = imgWidth * height / imgHeight;
-                    this.setState({ maxWidth, translateX: maxWidth });
+                    console.log('imgWidth', imgWidth);
+                    console.log('imgHeight', imgHeight);
+
+                    const screenHeight = Math.round(Dimensions.get('window').height);
+                    console.log('screenHeight', screenHeight);
+
+                    const screenWidth = Math.round(Dimensions.get('window').width);
+                    console.log('screenWidth', screenWidth);
+
+                    let maxWidth = imgWidth * screenHeight / imgHeight;
+                    this.setState({ maxWidth });
+                    console.log('maxWidth', maxWidth, this.state.maxWidth);
+
+                    console.log('translateX', this.state.translateX);
+
+
+                    Animated.timing(this.state.translateX, {
+                        toValue: (this.state.maxWidth - screenWidth),
+                        duration: 4000,
+                        delay: this.props.index * 5000,
+                        easing: Easing.ease
+                    }).start();
+            
                 } catch (err) {
 
                 }
             });
         }
 
-        this.startAnimation();
-    }
 
-    startAnimation() {
-        console.log('startAnimation');
-
-        Animated.timing(
-            this.state.translateX,
-            {
-                toValue: 1550,
-                duration: 5000,
-                easing: Easing.ease
-            }
-        ).start();
     }
 
     render() {
-        console.log('render');
-
         const { uriPath } = this.props;
         const { translateX } = this.state;
+        const screenHeight = Math.round(Dimensions.get('window').height);
 
         return (
             <View style={{ flex: 1, alignItems: "center" }}>
                 <Animated.Image
-                    style={{ height: 900,  resizeMode: 'cover', width: 2000, alignSelf: 'flex-end', transform: [{ translateX }] }}
+                    style={{ height: screenHeight, aspectRatio: 2, resizeMode: 'cover', alignSelf: 'flex-end', transform: [{ translateX }] }}
                     source={{ uri: uriPath }}
                 />
             </View>
