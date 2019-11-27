@@ -43,7 +43,12 @@ export default class ImageSlideContainer extends Component {
       easing: Easing.ease,
       useNativeDriver: true,
       duration,
-    }).start(({ finished }) => finished && this.snapToNext());
+    }).start(({ finished }) => {
+      if (finished && (index != (items.length - 1))) 
+      {
+        this.snapToNext();
+      }
+    });
   }
 
 
@@ -54,16 +59,15 @@ export default class ImageSlideContainer extends Component {
 
     timer.stopAnimation(() => {
 
-        this.slideShow.scrollToIndex({ animated: true, index: newIndex });
-        this.setState({ timer: new Animated.Value(0), index: newIndex }, () => {
-          this.animation();
-        });
-      
+      this.slideShow.scrollToIndex({ animated: true, index: newIndex });
+      this.setState({ timer: new Animated.Value(0), index: newIndex }, () => {
+        this.animation();
+      });
+
     });
   }
 
   renderItem({ item, index }) {
-    console.log('renderImageItem', ImgWrapper, item.uri);
     return (
       <ImgWrapper uriPath={item.uri} index={index} ></ImgWrapper>
     );
